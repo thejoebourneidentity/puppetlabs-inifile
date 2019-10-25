@@ -27,7 +27,7 @@ matrix:
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_deb]'
       - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='localhost*'
-      - bundle exec rake 'litmus:install_agent[puppet5]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -42,7 +42,7 @@ matrix:
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_deb]'
       - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='localhost*'
-      - bundle exec rake 'litmus:install_agent[puppet6]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -55,7 +55,7 @@ matrix:
       rvm: 2.5.3
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_el]'
-      - bundle exec rake 'litmus:install_agent[puppet5]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -68,7 +68,7 @@ matrix:
       rvm: 2.5.3
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_el]'
-      - bundle exec rake 'litmus:install_agent[puppet6]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -87,8 +87,14 @@ branches:
     - master
     - /^v\d/
     - release
+    - /^travis.+/
 notifications:
   email: false
+  slack:
+    rooms:
+      secure: N7Sjw/Zv2KwshBCqoHe6TKESxJHVsWMzDcLbQ9NPHwigDfKr68CSNZXY1MLfjM3y0lZhg+YDcrReYw2v92pgtEEEZoEF9k53upornqOST7rTPvsEeIzuO7BEYOMrfZz6j+f4rRrTFThazcqvHADM2NsI6OyN0INKloXNI1yP/2I=
+      on_success: change
+      on_failure: always
 deploy:
   provider: puppetforge
   user: puppet
